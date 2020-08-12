@@ -1,0 +1,33 @@
+# Read data from JSON
+
+df = spark.read.format("json").load("data/flights.json")
+df.show(2)
+df.printSchema()
+
+df2 = spark.read.json("data/flights.json")
+
+
+
+# Reading CSV data
+
+df_csv = spark.read.format("csv").load("data/flights.csv")
+df_csv.show(2)
+
+df_csv = spark.read.format("csv") \
+... .option("inferSchema", "true") \
+... .option("header","true") \
+... .load("data/flights.csv")
+df_csv.show(2)
+
+df_csv1 = spark.read.csv("data/flights.csv", inferSchema="true", header="true")
+
+
+# Reading TSV data
+df_tsv = spark.read.csv("data/flights.tsv", sep="\t", inferSchema="true", header="true")
+
+df_pipe = spark.read \
+... .format("csv") \
+... .option("sep","|")\
+... .option("inferSchema","true")\
+... .option("header","true")\
+... .load("data/flights_pipe.txt")
