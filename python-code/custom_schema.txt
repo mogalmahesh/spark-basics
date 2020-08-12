@@ -1,0 +1,41 @@
+# Importing necessary things
+from pyspark.sql.types import StructField, StructType, StringType,LongType
+
+# Creating a custom schema
+
+custom_schema = StructType([
+    StructField("destination", StringType(), True),
+    StructField("source", StringType(), True),
+    StructField("total_flights", LongType(), True),
+])
+
+df = spark.read.format("csv") \
+    .schema(custom_schema) \
+    .option("header", True) \
+    .load("data/flights.csv")
+
+df.show(2)
+
+df.printSchema()
+
+# Custom Schema with metadata
+
+custom_schema_with_metadata = StructType([
+    StructField("destination", StringType(), True, metadata={"desc": "destination country for flight"}),
+    StructField("source", StringType(), True,  metadata={"desc": "source country of flight"}),
+    StructField("total_flights", LongType(), True, metadata={"desc": "Number of flights"}),
+])
+
+df = spark.read.format("csv") \
+    .schema(custom_schema_with_metadata) \
+    .option("header", True) \
+    .load("data/flights.csv")
+
+df.printSchema()
+
+#if you want to check metadata of a schema 
+
+df.schema.json()
+
+# get metadata for each column
+df.schema.fields[0].metadata["desc"]
