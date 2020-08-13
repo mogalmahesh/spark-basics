@@ -1,0 +1,45 @@
+# Reading Existing data
+
+df_csv = spark.read.format("csv") \
+        .option("inferSchema", "true") \
+        .option("header","true") \
+        .load("data/flights.csv")
+
+# Selecting columns
+from pyspark.sql.functions import col, column
+
+df_csv.select("DEST_COUNTRY_NAME").show(2)
+
+df_csv.select(col("DEST_COUNTRY_NAME"), column("count")).show(2)
+
+#listing columns
+df_csv.columns
+
+# using "expr" to list columns
+from pyspark.sql.functions import expr
+
+df_csv.select(expr("DEST_COUNTRY_NAME as destination" )).show(2)
+
+# shorthand for select and "expr"
+df_csv.selectExpr("DEST_COUNTRY_NAME as destination").show(2)
+
+
+----
+# Adding Column names
+df_csv.withColumn("is_international_flights", \
+    expr("DEST_COUNTRY_NAME != ORIGIN_COUNTRY_NAME")) \
+    .show(2)
+
+
+----
+#renaming column
+
+# we can rename using "withColumn"
+df_csv.withColumn("destination", expr("DEST_COUNTRY_NAME")).show(2)
+
+#bettwr way to rename a column
+df_csv.withColumnRenamed("DEST_COUNTRY_NAME", "destination").show(2)
+
+
+# dropping column
+df_csv.drop("count").show(2)

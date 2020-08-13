@@ -1,0 +1,31 @@
+df_csv = spark.read.format("csv") \
+        .option("inferSchema", "true") \
+        .option("header","true") \
+        .load("data/flights.csv")
+
+
+# selecting columns
+from pyspark.sql.functions import expr
+
+df_csv.select(expr("count")).show(2)
+
+
+# using it for performing operations on column
+df_csv.select(expr("count"), expr("count > 10")).show(2)
+
+# giving a name to expression column
+df_csv.select(expr("count"), expr("count > 10 as if_greater_than_10")).show(2)
+
+# using alias functions
+df_csv.select(expr("count"), expr("count > 10").alias("if_greater_than_10")).show(2)
+
+# selecting all columns with expression
+df_csv.select("*", expr("count > 10").alias("if_greater_than_10")).show(2)
+
+# using this to rename columns
+df_csv.select("*", expr("DEST_COUNTRY_NAME").alias("dest")).show(2)
+
+# using shorthand
+df_csv.selectExpr("count", "count > 10 as if_greater_than_10").show(2)
+
+df_csv.selectExpr("*", "DEST_COUNTRY_NAME as dest").show(2)
