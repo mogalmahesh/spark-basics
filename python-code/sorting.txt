@@ -1,0 +1,22 @@
+df_csv = spark.read.format("csv") \
+        .option("inferSchema", "true") \
+        .option("header","true") \
+        .load("data/flights.csv")
+
+#sorting data on count
+df_csv.sort("count").show(2)
+
+# using multiple columns
+df_csv.sort("count", "DEST_COUNTRY_NAME").show(2)
+
+# using order by
+df_csv.orderBy("count", "DEST_COUNTRY_NAME").show(2)
+
+# using column expression
+from pyspark.sql.functions import col
+df_csv.orderBy(col("count"), col("DEST_COUNTRY_NAME")).show(2)
+
+
+# changing a default sorting order 
+from pyspark.sql.functions import desc
+df_csv.sort(col("count").desc()).show(2)

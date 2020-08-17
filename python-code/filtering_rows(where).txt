@@ -1,0 +1,15 @@
+df_csv = spark.read.format("csv") \
+        .option("inferSchema", "true") \
+        .option("header","true") \
+        .load("data/flights.csv")
+
+df_csv.where("count > 50").show(5)
+
+#filter function
+
+df_csv.filter(col("DEST_COUNTRY_NAME") == "United States").show(5)
+
+# chaining multiple conditions
+df_csv.where("DEST_COUNTRY_NAME == 'United States'") \
+    .where("count>50") \
+    .show(5)

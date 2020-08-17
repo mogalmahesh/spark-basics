@@ -1,0 +1,26 @@
+df_csv = spark.read.format("csv") \
+        .option("inferSchema", "true") \
+        .option("header","true") \
+        .load("data/flights.csv")
+
+# getting distinct rows from a data frame
+df_csv.select("DEST_COUNTRY_NAME", "ORIGIN_COUNTRY_NAME") \
+    .distinct() \
+    .show(5)
+
+# getting a count for distinct rows
+df_csv.select("DEST_COUNTRY_NAME", "ORIGIN_COUNTRY_NAME") \
+    .distinct() \
+    .count()
+
+#using where with distinct count
+df_csv.select("DEST_COUNTRY_NAME", "ORIGIN_COUNTRY_NAME") \
+    .where("DEST_COUNTRY_NAME != ORIGIN_COUNTRY_NAME") \
+    .distinct() \
+    .count()
+
+#using countDistinct function to get column
+from pyspark.sql.functions import countDistinct
+df_csv.agg(countDistinct("DEST_COUNTRY_NAME","ORIGIN_COUNTRY_NAME") \
+    .alias("c")) \
+    .show(2)

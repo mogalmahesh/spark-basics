@@ -1,0 +1,12 @@
+df = spark.read.format("csv") \
+    .option("inferSchema", "true") \
+    .option("header","true") \
+    .load("data/sample.csv")
+
+
+from pyspark.sql.functions import col,desc
+df.orderBy(col("count")).show()
+
+# asc_nulls_first
+
+### to do 
