@@ -46,6 +46,15 @@ df.select( \
     length(trim(col("DEST_COUNTRY_NAME"))).alias("length_without_whitespace") \
     ).show(5)
 
+# using regexp_replace to remove white spaces around string
+reg_exp="\\s+"
+reg = regexp_replace(col("DEST_COUNTRY_NAME"), reg_exp,"")
+df.select("DEST_COUNTRY_NAME", \
+    length(col("DEST_COUNTRY_NAME")).alias("length_with_whitespace"), \
+    reg.alias("white space removed"), \
+    length(reg).alias("length_without_whitespace") \
+    ).show(5)
+
 # padding string 
 # lpad & rpad
 # let us say that we want to make count filed for 4 digits long by adding 0 to left
@@ -69,7 +78,7 @@ reg_exp = "United States"
 df_csv.select(regexp_replace \
     (col("DEST_COUNTRY_NAME"), \
     reg_exp,"us") \
-    .alias("dest")) \
+    .alias("dest"), "DEST_COUNTRY_NAME") \
     .show(5)
 
 
