@@ -1,0 +1,88 @@
+df_csv = spark.read.format("csv") \
+        .option("inferSchema", "true") \
+        .option("header","true") \
+        .load("data/flights.csv")
+
+# capitalize word
+from pyspark.sql.functions import initcap
+df_csv.select(initcap("DEST_COUNTRY_NAME")).show(2)
+
+# Uppercase
+from pyspark.sql.functions import upper, lower, col
+df_csv.select(upper(col("DEST_COUNTRY_NAME"))).show(2)
+
+# lower case
+df_csv.select(lower(col("ORIGIN_COUNTRY_NAME"))).show(2)
+
+df_csv.select(\
+  upper(col("DEST_COUNTRY_NAME")), \
+  lower(col("ORIGIN_COUNTRY_NAME")),\
+  "count").show(2)
+
+# removing white space
+df = spark.read.format("csv") \
+    .option("inferSchema", "true") \
+    .option("header","true") \
+    .load("data/sample.csv")
+df.show(5)
+
+# we can see that there are multiple white spaces around strings in this data
+# ltrim - removes white space from left of the string
+from pyspark.sql.functions import ltrim,rtrim,trim
+df.select(ltrim(col("DEST_COUNTRY_NAME"))).show(5)
+
+
+# rtrim - removes white space from right side of the string
+df.select(rtrim(col("DEST_COUNTRY_NAME"))).show(5)
+
+# trim - removing white spaces from both sides from string
+df.select(trim(col("DEST_COUNTRY_NAME"))).show(5)
+
+# we can check this has removed white space by checking length of string
+df.select( \
+    col("DEST_COUNTRY_NAME"), \
+    length(col("DEST_COUNTRY_NAME")).alias("length_with_whitespace"), \
+    trim(col("DEST_COUNTRY_NAME")), \
+    length(trim(col("DEST_COUNTRY_NAME"))).alias("length_without_whitespace") \
+    ).show(5)
+
+# padding string 
+# lpad & rpad
+# let us say that we want to make count filed for 4 digits long by adding 0 to left
+from pyspark.sql.functions import lpad, rpad
+df_csv.select("DEST_COUNTRY_NAME", \
+    "count", \
+    lpad(trim(col("count")), 4, "0").alias("formmated_data") \
+    ).show(2)
+
+# we can also use rpad if we want to add some characters to right side of string
+df_csv.select("DEST_COUNTRY_NAME", \
+    "count", \
+    rpad(trim(col("count")), 4, "0").alias("formmated_data") \
+    ).show(2)
+
+
+# regular expression 
+from pyspark.sql.functions import regexp_replace
+reg_exp = "United States"
+
+df_csv.select(regexp_replace \
+    (col("DEST_COUNTRY_NAME"), \
+    reg_exp,"us") \
+    .alias("dest")) \
+    .show(5)
+
+
+# using translate function to replace character by another character
+from pyspark.sql.functions import translate
+df_csv.select(translate \
+    (col("DEST_COUNTRY_NAME"), \
+    "t", "T") \
+    .alias("Updated Name") \
+    ).show(5)
+
+#checking if string contains substring
+from pyspark.sql.functions import instr
+df_csv.select("DEST_COUNTRY_NAME", \
+    instr(col("DEST_COUNTRY_NAME"), \
+    "United")).show(5)
