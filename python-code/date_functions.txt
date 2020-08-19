@@ -1,0 +1,124 @@
+# creating date data frame
+# using current_date and current_timestamp 
+
+from pyspark.sql.functions import current_date,current_timestamp
+
+df = spark.range(2) \
+    .withColumn("current_date", current_date()) \
+    .withColumn("current_timestamp", current_timestamp())
+
+df.show()
+
+# getting a day of the month 
+from pyspark.sql.functions import dayofmonth,col
+df.select("current_date", \
+    dayofmonth(col("current_date")) \
+    ).show()
+
+# getting a day of week
+from pyspark.sql.functions import dayofweek
+df.select("current_date", \
+    dayofweek(col("current_date")) \
+    ).show()
+
+# getting a day of the year
+from pyspark.sql.functions import dayofyear
+df.select("current_date", \
+    dayofyear(col("current_date")) \
+    ).show()
+
+# getting a week of year
+from pyspark.sql.functions import weekofyear
+df.select("current_date", \
+    weekofyear(col("current_date")) \
+    ).show()
+
+# getting year,quarter & month from date
+from pyspark.sql.functions import year, month, quarter
+df.select("current_date", \
+    year(col("current_date")).alias("year"), \
+    month(col("current_date")).alias("month"), \
+    quarter(col("current_date")).alias("quarter"), \
+    ).show(1)
+
+
+# getting last_day of month
+from pyspark.sql.functions import last_day
+df.select("current_date", \
+    last_day(col("current_date")) \
+    ).show()
+
+# converting a string to date in spark
+from pyspark.sql.functions import lit,to_date
+df = df.withColumn("date_to_string", to_date(lit("2020-08-31")))
+df.show()
+
+# null when date format is wrong
+df.withColumn("date_to_string", to_date(lit("2020-31-08"))).show()
+
+# using format string to specify date format
+format="yyyy-dd-MM"
+df.withColumn("date_to_string", to_date(lit("2020-31-08"), format)).show()
+
+# changing format of date
+from pyspark.sql.functions import date_format,col
+df.select("current_date", \
+    date_format(col("current_date"),"dd/MM/yyyy") \
+    ).show()
+
+# formatting date from timestamp
+from pyspark.sql.functions import date_trunc
+df.select("current_timestamp", \
+    date_trunc("year", col("current_timestamp")), \
+    date_trunc("yyyy", col("current_timestamp")), \
+    date_trunc("month", col("current_timestamp")), \
+    ).show()
+
+
+# getting date after n days or before n days
+# here we are getting date 7 days before and after todays date
+from pyspark.sql.functions import date_add, date_sub,col
+
+df_new = df.select("current_date", \
+    date_add(col("current_date"), 7) \
+        .alias("date_after_7_days"), \
+    date_sub(col("current_date"), 7) \
+        .alias("date_before_7_days") \
+    ).show()
+
+# adding months
+from pyspark.sql.functions import add_months
+df.select("current_date", \
+    add_months(col("current_date"), 3) \
+    ).show()
+
+# finding difference between dates
+from pyspark.sql.functions import datediff,months_between
+df_new.select( \
+    datediff(col("date_after_7_days"), col("current_date")), \
+    datediff(col("date_before_7_days"), col("date_after_7_days")) \
+    ).show()
+
+df_new.select( \
+    months_between(col("date_after_7_days"), to_date(lit("2020-09-30"))) \
+    ).show()
+
+# convert current timestamp to unix time stamp
+from pyspark.sql.functions import unix_timestamp
+df.select("current_timestamp", \
+    unix_timestamp(col("current_timestamp")) \
+    ).show()
+
+# from unix_timestamp to date
+df_unix =  df.withColumn("unix_timestamp", unix_timestamp(col("current_timestamp")))
+
+from pyspark.sql.functions import from_unixtime
+df_unix.select("unix_timestamp", \
+    from_unixtime(col("unix_timestamp")) \
+    ).show()
+
+from pyspark.sql.functions import to_timestamp,col
+df.select("current_date", \
+    to_timestamp(col("current_date"), "yyyy-MM-dd") \
+    ).show()
+
